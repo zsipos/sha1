@@ -48,7 +48,11 @@ module sha1_core(
                  output wire           ready,
 
                  output wire [159 : 0] digest,
-                 output wire           digest_valid
+                 output wire           digest_valid,
+
+                 input wire  [2 : 0]   digest_addr,
+                 input wire  [31 : 0]  digest_val,
+                 input wire            digest_we
                 );
 
 
@@ -190,6 +194,17 @@ module sha1_core(
               H2_reg <= H2_new;
               H3_reg <= H3_new;
               H4_reg <= H4_new;
+            end
+
+          if (digest_we)
+            begin
+              case (digest_addr)
+                0: H0_reg <= digest_val;
+                1: H1_reg <= digest_val;
+                2: H2_reg <= digest_val;
+                3: H3_reg <= digest_val;
+                4: H4_reg <= digest_val;
+              endcase
             end
 
           if (round_ctr_we)

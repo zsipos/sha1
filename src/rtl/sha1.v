@@ -93,6 +93,7 @@ module sha1(
   reg          block_we;
 
   reg [159 : 0] digest_reg;
+  reg           digest_we;
 
   reg digest_valid_reg;
 
@@ -136,7 +137,11 @@ module sha1(
                  .ready(core_ready),
 
                  .digest(core_digest),
-                 .digest_valid(core_digest_valid)
+                 .digest_valid(core_digest_valid),
+
+                 .digest_addr(address - ADDRESS_DIGEST0),
+                 .digest_val(write_data),
+                 .digest_we(digest_we)
                 );
 
 
@@ -186,6 +191,7 @@ module sha1(
       init_new      = 0;
       next_new      = 0;
       block_we      = 0;
+      digest_we     = 0;
       tmp_read_data = 32'h0;
       tmp_error     = 0;
 
@@ -195,6 +201,8 @@ module sha1(
             begin
               if ((address >= ADDR_BLOCK0) && (address <= ADDR_BLOCK15))
                 block_we = 1;
+              if ((address >= ADDR_DIGEST0) && (address <= ADDR_DIGEST4))
+                digest_we = 1;
 
               if (address == ADDR_CTRL)
                 begin
